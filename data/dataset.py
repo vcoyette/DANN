@@ -2,14 +2,14 @@
 import os
 
 from PIL import Image
-import torch
+from torch.utils.data import Dataset
 
 
-class CustomDataset(torch.utils.data.Dataset):
-    """Custom Dataset."""
+class MNIST_M(Dataset):
+    """MNIST_M Dataset."""
 
     def __init__(self, data_root, data_list, transform=None):
-        """Initialize CustomDataset.
+        """Initialize MNIST_M data set.
 
         Keyword Params:
             root -- the root folder containing the data
