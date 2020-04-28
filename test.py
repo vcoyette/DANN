@@ -21,7 +21,7 @@ def testBaseLine(network, testloader):
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-    return correct, total
+    return correct / total * 100
 
 
 def testDANN(network, testloader):
@@ -43,4 +43,4 @@ def testDANN(network, testloader):
             _, predicted = torch.max(outputs[0].data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
-    return correct, total
+    return correct / total * 100
