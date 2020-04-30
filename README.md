@@ -9,3 +9,11 @@ Download the archive to the data forlder, the notebook deals with the extraction
 
 # Running
 Open the DANN.ipynb notebook.
+
+# Results
+
+
+|                    | Baseline | DANN (100 epochs) |
+|--------------------|----------|-------------------|
+| Accuracy on target | 56%      | 79 %              |
+
