@@ -19,7 +19,8 @@ Task = namedtuple('Task', [
     'load_target',
     'feature_extractor',
     'classifier',
-    'domain_regressor'
+    'domain_regressor',
+    'schedule_lr'
 ])
 
 # Init list of tasks
@@ -31,7 +32,8 @@ task = Task(
     load_target=load_mnist_m,
     feature_extractor=mnist.FeatureExtractor,
     classifier=mnist.Classifier,
-    domain_regressor=mnist.DomainRegressor
+    domain_regressor=mnist.DomainRegressor,
+    schedule_lr=True
 )
 
 tasks.append(task)
@@ -42,7 +44,8 @@ task = Task(
     load_target=load_mnist,
     feature_extractor=svhn.FeatureExtractor,
     classifier=svhn.Classifier,
-    domain_regressor=svhn.DomainRegressor
+    domain_regressor=svhn.DomainRegressor,
+    schedule_lr=False
 )
 
 tasks.append(task)
