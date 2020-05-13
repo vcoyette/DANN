@@ -1,4 +1,5 @@
 """Utils classes and functions."""
+import glob
 import os
 
 from PIL import Image
@@ -34,5 +35,53 @@ class MNIST_M(Dataset):
             imgs = self.transform(imgs)
 
         labels = int(labels)
+
+        return imgs, labels
+
+
+class Office(Dataset):
+    """Office Dataset."""
+
+    def __init__(self, data_root, dataset, transform=None):
+        """Initialize an Office dataset.
+
+        Keyword Parameters:
+            data_root -- root of the office dataset
+            dataset -- name of the dataset to use,
+                       one of ['amazon', 'dslr', 'webcam']
+            trainsform (optional) -- transform images when loading
+        """
+        # Validate dataset parameter
+        available_datasets = ['amazon', 'dslr', 'webcam']
+        if dataset.lower() not in available_datasets:
+            raise ValueError(f'Unknown dataset: {dataset}.'
+                             f'Chose one of: {available_datasets}')
+
+        # Get dataset directory
+        dataset_dir = os.path.join(data_root, dataset, 'images')
+
+        # Images path
+        img_regexp = os.path.join(dataset_dir, '*/*')
+        self.images = glob.glob(img_regexp)
+
+        # Get labels
+        classes = sorted(os.listdir(dataset_dir))
+        self.labels = list(map(lambda img: classes.index(img.split('/')[-2]),
+                               self.images))
+
+        self.transform = transform
+
+    def __len__(self):
+        """Get length of dataset."""
+        return len(self.images)
+
+    def __getitem__(self, idx):
+        """Get item."""
+        img_name, labels = self.images[idx], self.labels[idx]
+
+        imgs = Image.open(img_name).convert('RGB')
+
+        if self.transform:
+            imgs = self.transform(imgs)
 
         return imgs, labels

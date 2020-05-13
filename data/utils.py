@@ -5,7 +5,7 @@ import torch
 import torchvision
 import torchvision.transforms as transforms
 
-from data.dataset import MNIST_M
+from data.dataset import MNIST_M, Office
 
 
 def load_mnist(**kwargs):
@@ -16,7 +16,7 @@ def load_mnist(**kwargs):
 
     """
     # Load source images
-    transform_source = transforms.Compose(
+    transform = transforms.Compose(
         [transforms.ToTensor(),
          transforms.Normalize((0.5,), (0.5,)),
          # Make 3D images from grayscal MNIST
@@ -25,12 +25,12 @@ def load_mnist(**kwargs):
     trainset = torchvision.datasets.MNIST(root='./data',
                                           train=True,
                                           download=True,
-                                          transform=transform_source)
+                                          transform=transform)
 
     testset = torchvision.datasets.MNIST(root='./data',
                                          train=False,
                                          download=True,
-                                         transform=transform_source)
+                                         transform=transform)
 
     return get_loader(trainset, **kwargs),\
         get_loader(testset, **kwargs)
@@ -44,7 +44,7 @@ def load_svhn(**kwargs):
 
     """
     # Load source images
-    transform_source = transforms.Compose(
+    transform = transforms.Compose(
         [transforms.Resize(28),
          transforms.ToTensor(),
          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
@@ -53,15 +53,36 @@ def load_svhn(**kwargs):
     trainset = torchvision.datasets.SVHN(root='./data',
                                          split='train',
                                          download=True,
-                                         transform=transform_source)
+                                         transform=transform)
 
     testset = torchvision.datasets.SVHN(root='./data',
                                         split='test',
                                         download=True,
-                                        transform=transform_source)
+                                        transform=transform)
 
     return get_loader(trainset, **kwargs),\
         get_loader(testset, **kwargs)
+
+
+def load_office(dataset, **kwargs):
+    """Load an Office Dataset.
+
+    :dataset: TODO
+    :**kwargs: TODO
+    :returns: TODO
+    """
+    transform = transforms.Compose([
+        transforms.Resize([224, 224]),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+
+    dataset = Office(data_root=os.path.join('data', 'office'),
+                     dataset=dataset,
+                     transform=transform)
+
+    # Use sane dataset for testing and training as contains few images
+    return get_loader(dataset, **kwargs), get_loader(dataset, **kwargs)
 
 
 def load_mnist_m(**kwargs):

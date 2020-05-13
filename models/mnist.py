@@ -1,4 +1,4 @@
-"""Define models for networks."""
+"""Define models for MNIST domain."""
 
 import torch.nn as nn
 import torch.nn.functional as F
