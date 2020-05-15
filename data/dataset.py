@@ -1,4 +1,5 @@
 """Utils classes and functions."""
+import cv2
 import glob
 import os
 
@@ -77,11 +78,12 @@ class Office(Dataset):
 
     def __getitem__(self, idx):
         """Get item."""
-        img_name, labels = self.images[idx], self.labels[idx]
+        img_name, label = self.images[idx], self.labels[idx]
 
-        imgs = Image.open(img_name).convert('RGB')
+        img = cv2.imread(img_name)
+        img = cv2.resize(img, (256, 256))
 
         if self.transform:
-            imgs = self.transform(imgs)
+            img = self.transform(img)
 
-        return imgs, labels
+        return img, label
