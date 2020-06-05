@@ -1,11 +1,12 @@
 """Utility functions for data."""
 import os
+import glob
 
 import torch
 import torchvision
 import torchvision.transforms as transforms
 
-from data.dataset import MNIST_M, Office
+from data.dataset import MNIST_M, Office, SynSigns, GTSRB
 
 
 def load_mnist(**kwargs):
@@ -15,7 +16,6 @@ def load_mnist(**kwargs):
     :returns: train_loader, test_loader
 
     """
-    # Load source images
     transform = transforms.Compose(
         [transforms.ToTensor(),
          transforms.Normalize((0.5,), (0.5,)),
@@ -43,7 +43,6 @@ def load_svhn(**kwargs):
     :returns: train_loader, test_loader
 
     """
-    # Load source images
     transform = transforms.Compose(
         [transforms.Resize(28),
          transforms.ToTensor(),
@@ -59,6 +58,62 @@ def load_svhn(**kwargs):
                                         split='test',
                                         download=True,
                                         transform=transform)
+
+    return get_loader(trainset, **kwargs),\
+        get_loader(testset, **kwargs)
+
+
+def load_synsigns(**kwargs):
+    """Load SynSigns dataloader.
+
+    :**kwargs: arguments to pass to dataloader constructor
+    :returns: train_loader, test_loader
+
+    """
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+
+    fullset = SynSigns('data/synsigns',
+                       'train_labelling.txt',
+                       transform=transform)
+
+    # Split the dataset, 80% for training and 20% for testing
+    trainset_length = int(len(fullset) * 0.8)
+    testset_lenght = len(fullset) - trainset_length
+    lengths = [trainset_length, testset_lenght]
+
+    trainset, testset = torch.utils.data.random_split(fullset, lengths)
+
+    return get_loader(trainset, **kwargs),\
+        get_loader(testset, **kwargs)
+
+
+def load_gtsrb(**kwargs):
+    """Load GTSRB dataloader.
+
+    :**kwargs: arguments to pass to dataloader constructor
+    :returns: train_loader, test_loader
+
+    """
+    train_folders = glob.glob('data/GTSRB/Final_Training/Images/*')
+
+    transform = transforms.Compose([
+        transforms.Resize((40, 40)),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+    ])
+
+    fullset = torch.utils.data.ConcatDataset(
+            [GTSRB(folder, transform=transform) for folder in train_folders])
+
+    # Split the dataset, 80% for training and 20% for testing
+    trainset_length = int(len(fullset) * 0.8)
+    testset_lenght = len(fullset) - trainset_length
+    lengths = [trainset_length, testset_lenght]
+
+    trainset, testset = torch.utils.data.random_split(fullset, lengths)
 
     return get_loader(trainset, **kwargs),\
         get_loader(testset, **kwargs)
@@ -105,7 +160,6 @@ def load_mnist_m(**kwargs):
     :returns: train_loader, test_loader
 
     """
-    # Load target images
     img_transform = transforms.Compose([
         transforms.Resize(28),
         transforms.ToTensor(),

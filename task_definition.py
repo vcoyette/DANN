@@ -4,14 +4,16 @@ Available tasks are:
     0. MNIST to MNIST_M
     1. SVHN to MNIST
     2. AMAZON to WEBCAM
+    3. Syn Signs to GTSRB
 
 Each task is represented by a namedtuple containing utils to
 load source and target domains and networks definitions.
 """
 from collections import namedtuple
 
-from data.utils import load_mnist, load_mnist_m, load_svhn, load_office
-from models import mnist, svhn, office
+from data.utils import load_mnist, load_mnist_m, load_svhn, load_office,\
+                       load_gtsrb, load_synsigns
+from models import mnist, svhn, office, synsign
 
 
 # Each task is represented by the following named tuple:
@@ -58,6 +60,18 @@ task = Task(
     feature_extractor=office.FeatureExtractor,
     classifier=office.Classifier,
     domain_regressor=office.DomainRegressor,
+    schedule_lr=True
+)
+
+tasks.append(task)
+
+# Syn Sign to GTSRB
+task = Task(
+    load_source=load_synsigns,
+    load_target=load_gtsrb,
+    feature_extractor=synsign.FeatureExtractor,
+    classifier=synsign.Classifier,
+    domain_regressor=synsign.DomainRegressor,
     schedule_lr=True
 )
 

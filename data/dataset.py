@@ -4,6 +4,7 @@ import glob
 import os
 
 from PIL import Image
+import scipy.io as sio
 from torch.utils.data import Dataset
 
 
@@ -39,6 +40,83 @@ class MNIST_M(Dataset):
 
         return imgs, labels
 
+
+class SynSigns(Dataset):
+    """Synthetic signalisation Dataset."""
+
+    def __init__(self, data_root, annotation_file, transform=None):
+        """Init dataset.
+
+        Keyword Parameters:
+            data_root -- root of the dataset folder
+            annotation_file -- name of the annotation file
+            trainsform (optional) -- transform images when loading
+        """
+        path = os.path.join(data_root, annotation_file)
+        self.data_root = data_root
+
+        with open(path, 'r') as f:
+            self.data_list = f.readlines()
+
+        self.transform = transform
+
+    def __len__(self):
+        """Get length of dataset."""
+        return len(self.data_list)
+
+    def __getitem__(self, idx):
+        """Get item."""
+        name, label, _ = self.data_list[idx].split(' ')
+
+        path = os.path.join(self.data_root, name)
+
+        img = Image.open(path)
+
+        if self.transform:
+            img = self.transform(img)
+
+        return img, int(label)
+
+
+class GTSRB(Dataset):
+    """GTRSB dataset."""
+
+    def __init__(self, image_dir, transform=None):
+        """Init dataset.
+
+        Keyword Parameters:
+            image-dir -- directory containing images and csv annotation file
+            trainsform (optional) -- transform images when loading
+        """
+        self.image_dir = image_dir
+
+        annotations = glob.glob(image_dir + '/*.csv')
+
+        with open(annotations[0], 'r') as f:
+            self.data_list = f.readlines()[1:]
+
+        self.transform = transform
+
+    def __len__(self):
+        """Lenght of dataset."""
+        return len(self.data_list)
+
+    def __getitem__(self, idx):
+        """Get item."""
+        name, w, h, x1, y1, x2, y2, c = self.data_list[idx].split(';')
+
+        path = os.path.join(self.image_dir, name)
+        img = Image.open(path)
+
+        x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
+
+        # Remove borders
+        img = img.crop((x1, y1, x2, y2))
+
+        if self.transform:
+            img = self.transform(img)
+
+        return img, int(c)
 
 class Office(Dataset):
     """Office Dataset."""
